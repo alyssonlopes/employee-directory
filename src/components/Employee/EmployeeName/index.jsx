@@ -1,8 +1,13 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 class EmployeeName extends React.Component {
+  static propTypes = {
+    name: PropTypes.string,
+  };
+
   render() {
-    return <span> Jonathan Engel</span>;
+    return <span> {this.props.name}</span>;
   }
 }
 

@@ -4,25 +4,30 @@ class Form extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "aaaaaa",
-      position: "bbbbbb",
-      phone: "4444",
+      name: "",
+      positions: [],
+      selectedPosition: "",
+      phone: "",
       isLoading: true,
     };
   }
 
+  setPhone = (value) => {
+    const notANumber = value.replace(/\d/g, "");
+    console.log("notANumber", notANumber);
+    const ultimoDigito = value[value.length - 1];
+
+    if (Number(ultimoDigito) || ultimoDigito === "-") {
+      this.setState({ phone: value });
+    }
+  };
+
   handleChange = (event) => {
-    console.log({ event });
+    console.log("handleChange", { event });
     const inputName = event.target.name;
     const value = event.target.value;
     if (inputName === "phone") {
-      const notANumber = value.replace(/\d/g, "");
-      console.log("notANumber", notANumber);
-      const ultimoDigito = value[value.length - 1];
-
-      if (Number(ultimoDigito) || ultimoDigito === "-") {
-        this.setState({ [inputName]: `${event.target.value}` });
-      }
+      this.setPhone(value);
     } else {
       this.setState({ [inputName]: event.target.value });
     }
@@ -39,19 +44,14 @@ class Form extends Component {
     event.target.setCustomValidity("Por favor informe seu nome");
   };
 
-  componentDidUpdate;
-
   componentDidMount() {
     console.log("componentDidMount");
     setTimeout(() => {
-      console.log(this);
       this.setState({
-        name: "Alysson Lopes",
-        position: "Teacher",
-        phone: "7777-7777",
+        positions: ["Aluno", "Professor", "Coordenador"],
         isLoading: false,
       });
-    }, 5000);
+    }, 1000);
   }
 
   render() {
@@ -72,13 +72,19 @@ class Form extends Component {
             />
             <br />
             <label htmlFor="position">Position: </label>
-            <input
-              type="text"
-              name="position"
-              value={this.state.position}
+            <select
+              value={this.state.selectedPosition}
               onChange={this.handleChange}
-              required
-            ></input>
+              name="selectedPosition"
+            >
+              {this.state.positions.map((position, index) => {
+                return (
+                  <option key={index} value={position}>
+                    {position}
+                  </option>
+                );
+              })}
+            </select>
             <br />
             <label htmlFor="phone">Phone: </label>
             <input

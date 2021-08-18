@@ -5,16 +5,24 @@ import RegisterEmployeePage from "./pages/RegisterEmployeePage";
 class App extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = { isHomePage: false, isRegisterPage: true };
+    this.state = { isHomePage: true, isRegisterPage: false };
   }
+
+  onChangePage = () => {
+    this.setState({
+      isHomePage: !this.state.isHomePage,
+      isRegisterPage: !this.state.isRegisterPage,
+    });
+  };
 
   render() {
     return (
       <>
-        {this.state.isHomePage && <Homepage />}
+        {this.state.isHomePage && <Homepage onChangePage={this.onChangePage} />}
 
-        {this.state.isRegisterPage && <RegisterEmployeePage />}
+        {this.state.isRegisterPage && (
+          <RegisterEmployeePage onChangePage={this.onChangePage} />
+        )}
       </>
     );
   }
