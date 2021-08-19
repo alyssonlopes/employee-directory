@@ -4,6 +4,7 @@ import SearchBar from "../../components/SearchBar";
 import EmployeeList from "../../components/EmployeeList";
 import EmployeeListItem from "../../components/EmployeeListItem";
 import PropTypes from "prop-types";
+import Loading from "../../components/Loading";
 
 class Homepage extends React.Component {
   static propTypes = {
@@ -32,8 +33,6 @@ class Homepage extends React.Component {
   };
 
   async componentDidMount() {
-    console.log("componentDidMount");
-
     try {
       const response = await fetch("/api/employees");
       const json = await response.json();
@@ -47,15 +46,11 @@ class Homepage extends React.Component {
       this.setEmployeesData(list);
     } catch (error) {
       console.error(error);
-    } finally {
-      console.log("finally");
     }
   }
 
   onSearch = (event) => {
     const { value } = event.target;
-
-    console.log(this.employeesData);
 
     this.setState({
       employeesList: this.employeesData.filter((employee) => {
@@ -65,16 +60,15 @@ class Homepage extends React.Component {
   };
 
   render() {
-    console.log("render");
     return (
       <>
         <Header
           title={this.state.title}
           actionText="Add"
-          onAction={this.props.onChangePage}
+          onAddAction={this.props.onChangePage}
         />
         <SearchBar onSearch={this.onSearch} />
-        {this.state.isLoading && "Carregando lista.."}
+        {this.state.isLoading && <Loading />}
         {!this.state.isLoading && (
           <EmployeeList>
             {this.state.employeesList.map((employee, index) => {
@@ -86,4 +80,5 @@ class Homepage extends React.Component {
     );
   }
 }
+
 export default Homepage;
