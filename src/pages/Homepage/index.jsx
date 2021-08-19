@@ -22,26 +22,34 @@ class Homepage extends React.Component {
     this.employeesData = [];
   }
 
-  componentDidMount() {
+  setEmployeesData = (results) => {
+    this.employeesData = results;
+
+    this.setState({
+      employeesList: this.employeesData,
+      isLoading: false,
+    });
+  };
+
+  async componentDidMount() {
     console.log("componentDidMount");
-    setTimeout(() => {
-      this.employeesData = [
-        {
-          avatar: "kjkj",
-          name: "João Antônio",
-          position: "cargo",
-        },
-        {
-          avatar: "kjkj",
-          name: "João Bione",
-          position: "cargo2",
-        },
-      ];
-      this.setState({
-        employeesList: this.employeesData,
-        isLoading: false,
-      });
-    }, 2000);
+
+    try {
+      const response = await fetch("/api/employees");
+      const json = await response.json();
+
+      const list = json.results.map(({ picture, name, location }) => ({
+        avatar: picture.thumbnail,
+        name: `${name.first} ${name.last}`,
+        position: location.country,
+      }));
+
+      this.setEmployeesData(list);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      console.log("finally");
+    }
   }
 
   onSearch = (event) => {
@@ -57,6 +65,7 @@ class Homepage extends React.Component {
   };
 
   render() {
+    console.log("render");
     return (
       <>
         <Header

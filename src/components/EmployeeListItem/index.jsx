@@ -16,6 +16,7 @@ class EmployeeListItem extends React.Component {
       <li>
         <EmployeeAvatar url={this.props.avatar} />
         <EmployeeName name={this.props.name} />
+        {" | "}
         <Position position={this.props.position} />
       </li>
     );
