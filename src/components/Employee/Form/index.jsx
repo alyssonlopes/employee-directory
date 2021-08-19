@@ -5,16 +5,16 @@ class Form extends Component {
     super(props);
     this.state = {
       name: "",
+      email: "",
       positions: [],
       selectedPosition: "",
       phone: "",
       isLoading: true,
+      errorMessage: "",
     };
   }
 
   setPhone = (value) => {
-    const notANumber = value.replace(/\d/g, "");
-    console.log("notANumber", notANumber);
     const ultimoDigito = value[value.length - 1];
 
     if (Number(ultimoDigito) || ultimoDigito === "-") {
@@ -23,7 +23,6 @@ class Form extends Component {
   };
 
   handleChange = (event) => {
-    console.log("handleChange", { event });
     const inputName = event.target.name;
     const value = event.target.value;
     if (inputName === "phone") {
@@ -33,29 +32,49 @@ class Form extends Component {
     }
   };
 
-  onSubmit = (event) => {
+  checkEmailValidity = async () => {
+    const response = await fetch(`/api/verifica-email/${this.state.email}`);
+
+    const { validity } = await response.json();
+
+    return validity;
+  };
+
+  onSubmit = async (event) => {
     console.log("onSubmit", { event });
     event.preventDefault();
 
-    console.log("checkValidity", event.target.checkValidity());
-  };
-
-  onInvalid = (event) => {
-    event.target.setCustomValidity("Por favor informe seu nome");
-  };
-
-  componentDidMount() {
-    console.log("componentDidMount");
-    setTimeout(() => {
+    const isValid = await this.checkEmailValidity();
+    if (!isValid) {
       this.setState({
-        positions: ["Aluno", "Professor", "Coordenador"],
-        isLoading: false,
+        errorMessage: "Informe um e-mail válido",
       });
-    }, 1000);
+    } else {
+      // TODO: enviar pro servidor
+      this.setState({
+        errorMessage: "",
+      });
+    }
+  };
+
+  // onInvalid = (event) => {
+  //   event.target.setCustomValidity("Por favor informe seu nome");
+  // };
+
+  async componentDidMount() {
+    console.log("componentDidMount");
+
+    const response = await fetch("/api/positions");
+
+    const { positions } = await response.json();
+
+    this.setState({
+      positions,
+      isLoading: false,
+    });
   }
 
   render() {
-    console.log("render", this.state);
     return (
       <>
         {this.state.isLoading && "Carregando..."}
@@ -67,7 +86,15 @@ class Form extends Component {
               name="name"
               value={this.state.name}
               onChange={this.handleChange}
-              onInvalid={this.onInvalid}
+              required
+            />
+            <br />
+            <label htmlFor="email">E-mail: </label>
+            <input
+              type="email"
+              name="email"
+              value={this.state.email}
+              onChange={this.handleChange}
               required
             />
             <br />
@@ -98,6 +125,8 @@ class Form extends Component {
             ></input>
 
             <input type="submit" value="Send" />
+            <br />
+            {this.state.errorMessage && <span>{this.state.errorMessage}</span>}
           </form>
         )}
       </>
