@@ -1,5 +1,5 @@
 import React from "react";
-import Form from "../../components/Employee/Form";
+import EmployeeForm from "../../components/EmployeeForm";
 import Header from "../../components/Header";
 import PropTypes from "prop-types";
 
@@ -14,9 +14,9 @@ class RegisterEmployeePage extends React.Component {
         <Header
           title={"Register Employee Page"}
           actionText="Back"
-          onAction={this.props.onChangePage}
+          onBackAction={this.props.onChangePage}
         />
-        <Form />
+        <EmployeeForm />
       </>
     );
   }

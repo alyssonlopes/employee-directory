@@ -1,6 +1,10 @@
 import React, { Component } from "react";
+import Loading from "../Loading";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
+import Button from "@material-ui/core/Button";
 
-class Form extends Component {
+class EmployeeForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -41,7 +45,6 @@ class Form extends Component {
   };
 
   onSubmit = async (event) => {
-    console.log("onSubmit", { event });
     event.preventDefault();
 
     const isValid = await this.checkEmailValidity();
@@ -57,13 +60,7 @@ class Form extends Component {
     }
   };
 
-  // onInvalid = (event) => {
-  //   event.target.setCustomValidity("Por favor informe seu nome");
-  // };
-
   async componentDidMount() {
-    console.log("componentDidMount");
-
     const response = await fetch("/api/positions");
 
     const { positions } = await response.json();
@@ -77,44 +74,50 @@ class Form extends Component {
   render() {
     return (
       <>
-        {this.state.isLoading && "Carregando..."}
+        {this.state.isLoading && <Loading />}
         {!this.state.isLoading && (
-          <form onSubmit={this.onSubmit}>
-            <label htmlFor="name">Nome: </label>
-            <input
+          <form onSubmit={this.onSubmit} style={{ margin: 20 }}>
+            <TextField
               type="text"
               name="name"
+              label="Name"
               value={this.state.name}
               onChange={this.handleChange}
               required
+              fullWidth
             />
-            <br />
-            <label htmlFor="email">E-mail: </label>
-            <input
+
+            <TextField
+              label="E-mail"
               type="email"
               name="email"
               value={this.state.email}
               onChange={this.handleChange}
               required
+              fullWidth
+              helperText={this.state.errorMessage}
+              error={!!this.state.errorMessage}
             />
-            <br />
-            <label htmlFor="position">Position: </label>
-            <select
+
+            <TextField
+              label="Position"
+              select
               value={this.state.selectedPosition}
               onChange={this.handleChange}
               name="selectedPosition"
+              fullWidth
             >
               {this.state.positions.map((position, index) => {
                 return (
-                  <option key={index} value={position}>
+                  <MenuItem key={index} value={position}>
                     {position}
-                  </option>
+                  </MenuItem>
                 );
               })}
-            </select>
-            <br />
-            <label htmlFor="phone">Phone: </label>
-            <input
+            </TextField>
+
+            <TextField
+              label="Phone"
               type="tel"
               name="phone"
               value={this.state.phone}
@@ -122,11 +125,18 @@ class Form extends Component {
               pattern="[0-9]{4}-[0-9]{4}"
               placeholder="3333-3333"
               maxLength="9"
-            ></input>
+              fullWidth
+            />
 
-            <input type="submit" value="Send" />
-            <br />
-            {this.state.errorMessage && <span>{this.state.errorMessage}</span>}
+            <Button
+              variant="contained"
+              size="medium"
+              color="primary"
+              type="submit"
+              style={{ marginTop: 30, float: "right" }}
+            >
+              Send
+            </Button>
           </form>
         )}
       </>
@@ -134,4 +144,4 @@ class Form extends Component {
   }
 }
 
-export default Form;
+export default EmployeeForm;

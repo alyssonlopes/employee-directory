@@ -1,8 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import EmployeeAvatar from "../Employee/EmployeeAvatar";
-import EmployeeName from "../Employee/EmployeeName";
-import Position from "../Employee/Position";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import Avatar from "@material-ui/core/Avatar";
 
 class EmployeeListItem extends React.Component {
   static propTypes = {
@@ -13,12 +14,15 @@ class EmployeeListItem extends React.Component {
 
   render() {
     return (
-      <li>
-        <EmployeeAvatar url={this.props.avatar} />
-        <EmployeeName name={this.props.name} />
-        {" | "}
-        <Position position={this.props.position} />
-      </li>
+      <ListItem button>
+        <ListItemAvatar>
+          <Avatar src={this.props.avatar} />
+        </ListItemAvatar>
+        <ListItemText
+          primary={this.props.name}
+          secondary={this.props.position}
+        />
+      </ListItem>
     );
   }
 }
