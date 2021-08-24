@@ -65,7 +65,7 @@ class Homepage extends React.Component {
         <Header
           title={this.state.title}
           actionText="Add"
-          onAddAction={this.props.onChangePage}
+          addPath={"/register"}
         />
         <SearchBar onSearch={this.onSearch} />
         {this.state.isLoading && <Loading />}

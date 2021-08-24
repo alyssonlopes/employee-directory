@@ -11,11 +11,7 @@ class RegisterEmployeePage extends React.Component {
   render() {
     return (
       <>
-        <Header
-          title={"Register Employee Page"}
-          actionText="Back"
-          onBackAction={this.props.onChangePage}
-        />
+        <Header title={"Register Employee Page"} backPath={"/"} />
         <EmployeeForm />
       </>
     );
