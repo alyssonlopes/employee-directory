@@ -5,6 +5,8 @@ import EmployeeList from "../../components/EmployeeList";
 import EmployeeListItem from "../../components/EmployeeListItem";
 import PropTypes from "prop-types";
 import Loading from "../../components/Loading";
+import { Link } from "react-router-dom";
+import { getEmployeeFromJson } from "../../adapters/employee";
 
 class Homepage extends React.Component {
   static propTypes = {
@@ -15,7 +17,7 @@ class Homepage extends React.Component {
     super(props);
 
     this.state = {
-      title: "Employeer Directory",
+      title: "Employee Directory",
       employeesList: [],
       isLoading: true,
     };
@@ -37,11 +39,7 @@ class Homepage extends React.Component {
       const response = await fetch("/api/employees");
       const json = await response.json();
 
-      const list = json.results.map(({ picture, name, location }) => ({
-        avatar: picture.thumbnail,
-        name: `${name.first} ${name.last}`,
-        position: location.country,
-      }));
+      const list = json.results.map(getEmployeeFromJson);
 
       this.setEmployeesData(list);
     } catch (error) {
@@ -68,11 +66,25 @@ class Homepage extends React.Component {
           addPath={"/register"}
         />
         <SearchBar onSearch={this.onSearch} />
+
         {this.state.isLoading && <Loading />}
         {!this.state.isLoading && (
           <EmployeeList>
             {this.state.employeesList.map((employee, index) => {
-              return <EmployeeListItem key={index} {...employee} />;
+              console.log({ employee });
+              return (
+                <Link
+                  key={index}
+                  to={{
+                    pathname: "/employee",
+                    search: "?greetings=Welcome to Employee Directory",
+                    state: { employee },
+                  }}
+                  style={{ color: "inherit", textDecoration: "inherit" }}
+                >
+                  <EmployeeListItem {...employee} />
+                </Link>
+              );
             })}
           </EmployeeList>
         )}
