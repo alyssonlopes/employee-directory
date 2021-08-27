@@ -8,8 +8,11 @@ import Loading from "../../components/Loading";
 import { Link } from "react-router-dom";
 import { getEmployeeFromJson } from "../../adapters/employee";
 import { EmployeeContext } from "../../providers/Employee";
+import { APIContext } from "../../providers/Api";
 
 class InnerHomepage extends React.Component {
+  static contextType = APIContext;
+
   static propTypes = {
     onChangePage: PropTypes.func,
   };
@@ -37,10 +40,13 @@ class InnerHomepage extends React.Component {
 
   async componentDidMount() {
     try {
-      const response = await fetch("/api/employees");
-      const json = await response.json();
+      const {
+        api: { get },
+      } = this.context;
 
-      const list = json.results.map(getEmployeeFromJson);
+      const employees = await get("/api/employees");
+
+      const list = employees.results.map(getEmployeeFromJson);
 
       this.setEmployeesData(list);
     } catch (error) {
@@ -59,7 +65,6 @@ class InnerHomepage extends React.Component {
   };
 
   render() {
-    console.log(this.props);
     return (
       <>
         <Header
@@ -73,7 +78,6 @@ class InnerHomepage extends React.Component {
         {!this.state.isLoading && (
           <EmployeeList>
             {this.state.employeesList.map((employee, index) => {
-              console.log({ employee });
               return (
                 <Link
                   key={index}
@@ -96,7 +100,6 @@ const Homepage = ({ children, ...rest }) => {
   return (
     <EmployeeContext.Consumer>
       {(value) => {
-        console.log(value);
         return (
           <InnerHomepage {...rest} {...value}>
             {children}

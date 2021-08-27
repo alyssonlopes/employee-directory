@@ -3,8 +3,10 @@ import Loading from "../Loading";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
+import { APIContext } from "../../providers/Api";
 
 class EmployeeForm extends Component {
+  static contextType = APIContext;
   constructor(props) {
     super(props);
     this.state = {
@@ -37,9 +39,10 @@ class EmployeeForm extends Component {
   };
 
   checkEmailValidity = async () => {
-    const response = await fetch(`/api/verifica-email/${this.state.email}`);
-
-    const { validity } = await response.json();
+    const {
+      api: { get },
+    } = this.context;
+    const { validity } = await get(`/api/verifica-email/${this.state.email}`);
 
     return validity;
   };
