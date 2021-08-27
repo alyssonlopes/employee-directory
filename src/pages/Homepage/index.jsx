@@ -7,8 +7,9 @@ import PropTypes from "prop-types";
 import Loading from "../../components/Loading";
 import { Link } from "react-router-dom";
 import { getEmployeeFromJson } from "../../adapters/employee";
+import { EmployeeContext } from "../../providers/Employee";
 
-class Homepage extends React.Component {
+class InnerHomepage extends React.Component {
   static propTypes = {
     onChangePage: PropTypes.func,
   };
@@ -58,6 +59,7 @@ class Homepage extends React.Component {
   };
 
   render() {
+    console.log(this.props);
     return (
       <>
         <Header
@@ -75,12 +77,9 @@ class Homepage extends React.Component {
               return (
                 <Link
                   key={index}
-                  to={{
-                    pathname: "/employee",
-                    search: "?greetings=Welcome to Employee Directory",
-                    state: { employee },
-                  }}
+                  to="/employee"
                   style={{ color: "inherit", textDecoration: "inherit" }}
+                  onClick={() => this.props.setEmployee(employee)}
                 >
                   <EmployeeListItem {...employee} />
                 </Link>
@@ -92,5 +91,20 @@ class Homepage extends React.Component {
     );
   }
 }
+
+const Homepage = ({ children, ...rest }) => {
+  return (
+    <EmployeeContext.Consumer>
+      {(value) => {
+        console.log(value);
+        return (
+          <InnerHomepage {...rest} {...value}>
+            {children}
+          </InnerHomepage>
+        );
+      }}
+    </EmployeeContext.Consumer>
+  );
+};
 
 export default Homepage;
