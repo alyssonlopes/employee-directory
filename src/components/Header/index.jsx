@@ -7,40 +7,44 @@ import AddIcon from "@material-ui/icons/Add";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import { Link } from "react-router-dom";
 
-class Header extends React.Component {
-  static propTypes = {
-    title: PropTypes.string,
-    addPath: PropTypes.string,
-    backPath: PropTypes.string,
-  };
+const Header = ({ backPath, title, addPath, ...props }) => {
+  return (
+    <AppBar {...props} position="static">
+      <Toolbar>
+        {backPath && (
+          <Link
+            to={backPath}
+            style={{ color: "inherit", textDecoration: "inherit" }}
+          >
+            <KeyboardArrowLeft />
+          </Link>
+        )}
+        <Typography variant="h6" style={{ flexGrow: 1 }}>
+          {title}
+        </Typography>
+        {addPath && (
+          <Link
+            to={addPath}
+            style={{ color: "inherit", textDecoration: "inherit" }}
+          >
+            <AddIcon />
+          </Link>
+        )}
+      </Toolbar>
+    </AppBar>
+  );
+};
 
-  render() {
-    return (
-      <AppBar position="static">
-        <Toolbar>
-          {this.props.backPath && (
-            <Link
-              to={this.props.backPath}
-              style={{ color: "inherit", textDecoration: "inherit" }}
-            >
-              <KeyboardArrowLeft />
-            </Link>
-          )}
-          <Typography variant="h6" style={{ flexGrow: 1 }}>
-            {this.props.title}
-          </Typography>
-          {this.props.addPath && (
-            <Link
-              to={this.props.addPath}
-              style={{ color: "inherit", textDecoration: "inherit" }}
-            >
-              <AddIcon />
-            </Link>
-          )}
-        </Toolbar>
-      </AppBar>
-    );
-  }
-}
+Header.defaultProps = {
+  title: "Employee Directory",
+  addPath: null,
+  backPath: null,
+};
+
+Header.propTypes = {
+  title: PropTypes.string.isRequired,
+  addPath: PropTypes.string,
+  backPath: PropTypes.string,
+};
 
 export default Header;

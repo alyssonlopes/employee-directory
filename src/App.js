@@ -13,18 +13,16 @@ const orangeTheme = createTheme({
   },
 });
 
-class App extends React.Component {
-  render() {
-    return (
-      <ThemeProvider theme={orangeTheme}>
-        <APIProvider>
-          <EmployeeProvider>
-            <Routes />
-          </EmployeeProvider>
-        </APIProvider>
-      </ThemeProvider>
-    );
-  }
-}
+const App = () => {
+  return (
+    <ThemeProvider theme={orangeTheme}>
+      <APIProvider>
+        <EmployeeProvider>
+          <Routes />
+        </EmployeeProvider>
+      </APIProvider>
+    </ThemeProvider>
+  );
+};
 
 export default App;

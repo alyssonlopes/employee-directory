@@ -67,11 +67,7 @@ class InnerHomepage extends React.Component {
   render() {
     return (
       <>
-        <Header
-          title={this.state.title}
-          actionText="Add"
-          addPath={"/register"}
-        />
+        <Header title={this.state.title} addPath={"/register"} />
         <SearchBar onSearch={this.onSearch} />
 
         {this.state.isLoading && <Loading />}

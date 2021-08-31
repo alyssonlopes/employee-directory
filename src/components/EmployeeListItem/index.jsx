@@ -5,26 +5,21 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 
-class EmployeeListItem extends React.Component {
-  static propTypes = {
-    avatar: PropTypes.string,
-    name: PropTypes.string,
-    position: PropTypes.string,
-  };
+const EmployeeListItem = ({ avatar, name, position }) => {
+  return (
+    <ListItem button>
+      <ListItemAvatar>
+        <Avatar src={avatar} />
+      </ListItemAvatar>
+      <ListItemText primary={name} secondary={position} />
+    </ListItem>
+  );
+};
 
-  render() {
-    return (
-      <ListItem button>
-        <ListItemAvatar>
-          <Avatar src={this.props.avatar} />
-        </ListItemAvatar>
-        <ListItemText
-          primary={this.props.name}
-          secondary={this.props.position}
-        />
-      </ListItem>
-    );
-  }
-}
+EmployeeListItem.propTypes = {
+  avatar: PropTypes.string,
+  name: PropTypes.string,
+  position: PropTypes.string,
+};
 
 export default EmployeeListItem;

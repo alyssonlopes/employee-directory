@@ -5,32 +5,25 @@ import InputBase from "@material-ui/core/InputBase";
 import SearchIcon from "@material-ui/icons/Search";
 import { alpha } from "@material-ui/core/styles/colorManipulator";
 
-class SearchBar extends React.Component {
-  static propTypes = {
-    onSearch: PropTypes.func.isRequired,
-  };
-
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.search}>
-        <div className={classes.searchIcon}>
-          <SearchIcon />
-        </div>
-        <InputBase
-          placeholder="Search…"
-          type="search"
-          fullWidth={true}
-          classes={{
-            root: classes.inputRoot,
-            input: classes.inputInput,
-          }}
-          onChange={this.props.onSearch}
-        />
+const SearchBar = ({ classes, onSearch }) => {
+  return (
+    <div className={classes.search}>
+      <div className={classes.searchIcon}>
+        <SearchIcon />
       </div>
-    );
-  }
-}
+      <InputBase
+        placeholder="Search…"
+        type="search"
+        fullWidth={true}
+        classes={{
+          root: classes.inputRoot,
+          input: classes.inputInput,
+        }}
+        onChange={onSearch}
+      />
+    </div>
+  );
+};
 
 const styles = (theme) => ({
   search: {
@@ -65,5 +58,9 @@ const styles = (theme) => ({
     width: "100%",
   },
 });
+
+SearchBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+};
 
 export default withStyles(styles)(SearchBar);
