@@ -1,96 +1,73 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
 import EmployeeList from "../../components/EmployeeList";
 import EmployeeListItem from "../../components/EmployeeListItem";
-import PropTypes from "prop-types";
 import Loading from "../../components/Loading";
 import { Link } from "react-router-dom";
 import { getEmployeeFromJson } from "../../adapters/employee";
 import { EmployeeContext } from "../../providers/Employee";
-import { APIContext } from "../../providers/Api";
+import { get } from "../../api";
 
-class InnerHomepage extends React.Component {
-  static contextType = APIContext;
+const InnerHomepage = ({ setEmployee }) => {
+  const [employeesData, setEmployeesData] = useState(null);
+  const [employeesList, setEmployeesList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  static propTypes = {
-    onChangePage: PropTypes.func,
-  };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const employees = await get("/api/employees");
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      title: "Employee Directory",
-      employeesList: [],
-      isLoading: true,
-    };
-
-    this.employeesData = [];
-  }
-
-  setEmployeesData = (results) => {
-    this.employeesData = results;
-
-    this.setState({
-      employeesList: this.employeesData,
-      isLoading: false,
-    });
-  };
-
-  async componentDidMount() {
-    try {
-      const {
-        api: { get },
-      } = this.context;
-
-      const employees = await get("/api/employees");
-
-      const list = employees.results.map(getEmployeeFromJson);
-
-      this.setEmployeesData(list);
-    } catch (error) {
-      console.error(error);
+        const list = employees.results.map(getEmployeeFromJson);
+        setEmployeesData(list);
+      } catch (error) {
+        console.error(error);
+      }
     }
-  }
+    return fetchData();
+  }, []);
 
-  onSearch = (event) => {
+  useEffect(() => {
+    if (employeesData) {
+      setEmployeesList(employeesData);
+      setIsLoading(false);
+    }
+  }, [employeesData]);
+
+  const onSearch = (event) => {
     const { value } = event.target;
-
-    this.setState({
-      employeesList: this.employeesData.filter((employee) => {
-        return employee.name.toLowerCase().includes(value.toLowerCase());
-      }),
+    const list = employeesData.filter((employee) => {
+      return employee.name.toLowerCase().includes(value.toLowerCase());
     });
+    setEmployeesList(list);
   };
 
-  render() {
-    return (
-      <>
-        <Header title={this.state.title} addPath={"/register"} />
-        <SearchBar onSearch={this.onSearch} />
+  return (
+    <>
+      <Header title={"Employee Directory"} addPath={"/register"} />
+      <SearchBar onSearch={onSearch} />
 
-        {this.state.isLoading && <Loading />}
-        {!this.state.isLoading && (
-          <EmployeeList>
-            {this.state.employeesList.map((employee, index) => {
-              return (
-                <Link
-                  key={index}
-                  to="/employee"
-                  style={{ color: "inherit", textDecoration: "inherit" }}
-                  onClick={() => this.props.setEmployee(employee)}
-                >
-                  <EmployeeListItem {...employee} />
-                </Link>
-              );
-            })}
-          </EmployeeList>
-        )}
-      </>
-    );
-  }
-}
+      {isLoading && <Loading />}
+      {!isLoading && (
+        <EmployeeList>
+          {employeesList.map((employee, index) => {
+            return (
+              <Link
+                key={index}
+                to="/employee"
+                style={{ color: "inherit", textDecoration: "inherit" }}
+                onClick={() => setEmployee(employee)}
+              >
+                <EmployeeListItem {...employee} />
+              </Link>
+            );
+          })}
+        </EmployeeList>
+      )}
+    </>
+  );
+};
 
 const Homepage = ({ children, ...rest }) => {
   return (
