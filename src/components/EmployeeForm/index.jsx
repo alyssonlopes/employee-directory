@@ -1,150 +1,133 @@
-import React, { Component } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Loading from "../Loading";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import { APIContext } from "../../providers/Api";
 
-class EmployeeForm extends Component {
-  static contextType = APIContext;
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: "",
-      email: "",
-      positions: [],
-      selectedPosition: "",
-      phone: "",
-      isLoading: true,
-      errorMessage: "",
-    };
-  }
+const EmployeeForm = () => {
+  const { api } = useContext(APIContext);
 
-  setPhone = (value) => {
-    const ultimoDigito = value[value.length - 1];
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [positions, setPositions] = useState([]);
+  const [selectedPosition, setSelectedPosition] = useState("");
+  const [phone, setPhone] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-    if (Number(ultimoDigito) || ultimoDigito === "-") {
-      this.setState({ phone: value });
+  useEffect(() => {
+    async function fetchDataDoDaniel() {
+      const { positions } = await api.get("/api/positions");
+
+      setPositions(positions);
+      setIsLoading(false);
     }
+    fetchDataDoDaniel();
+  }, [api]);
+
+  const setPhoneMask = (textNumber) => {
+    let onlyNumber = textNumber.replace(/\D/g, "");
+    let numberWithMask = [...onlyNumber]
+      .map((letter, i) => {
+        if (i === 0) return ["(", letter];
+        if (i === 2) return [")", letter];
+        if (i === 6) return ["-", letter];
+        return letter;
+      })
+      .flat(1)
+      .join("");
+
+    setPhone(numberWithMask);
   };
 
-  handleChange = (event) => {
-    const inputName = event.target.name;
-    const value = event.target.value;
-    if (inputName === "phone") {
-      this.setPhone(value);
-    } else {
-      this.setState({ [inputName]: event.target.value });
-    }
-  };
-
-  checkEmailValidity = async () => {
-    const {
-      api: { get },
-    } = this.context;
-    const { validity } = await get(`/api/verifica-email/${this.state.email}`);
+  const checkEmailValidity = async () => {
+    const { validity } = await api.get(`/api/verifica-email/${email}`);
 
     return validity;
   };
 
-  onSubmit = async (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
 
-    const isValid = await this.checkEmailValidity();
+    const isValid = await checkEmailValidity();
     if (!isValid) {
-      this.setState({
-        errorMessage: "Informe um e-mail válido",
-      });
+      setErrorMessage("Informe um e-mail válido");
     } else {
       // TODO: enviar pro servidor
-      this.setState({
-        errorMessage: "",
-      });
+      setErrorMessage("");
     }
   };
 
-  async componentDidMount() {
-    const response = await fetch("/api/positions");
+  return (
+    <>
+      {isLoading && <Loading />}
+      {!isLoading && (
+        <form onSubmit={onSubmit} style={{ margin: 20 }}>
+          <TextField
+            type="text"
+            name="name"
+            label="Name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+            fullWidth
+          />
 
-    const { positions } = await response.json();
+          <TextField
+            label="E-mail"
+            type="email"
+            name="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+            fullWidth
+            helperText={errorMessage}
+            error={!!errorMessage}
+          />
 
-    this.setState({
-      positions,
-      isLoading: false,
-    });
-  }
+          <TextField
+            label="Position"
+            select
+            value={selectedPosition}
+            onChange={(event) => setSelectedPosition(event.target.value)}
+            name="selectedPosition"
+            fullWidth
+          >
+            {positions.map((position, index) => {
+              return (
+                <MenuItem key={index} value={position}>
+                  {position}
+                </MenuItem>
+              );
+            })}
+          </TextField>
 
-  render() {
-    return (
-      <>
-        {this.state.isLoading && <Loading />}
-        {!this.state.isLoading && (
-          <form onSubmit={this.onSubmit} style={{ margin: 20 }}>
-            <TextField
-              type="text"
-              name="name"
-              label="Name"
-              value={this.state.name}
-              onChange={this.handleChange}
-              required
-              fullWidth
-            />
+          <TextField
+            label="Phone"
+            type="tel"
+            name="phone"
+            value={phone}
+            onChange={(event) => setPhoneMask(event.target.value)}
+            pattern="[0-9]{4}-[0-9]{4}"
+            placeholder="3333-3333"
+            inputProps={{ maxLength: 14 }}
+            fullWidth
+          />
 
-            <TextField
-              label="E-mail"
-              type="email"
-              name="email"
-              value={this.state.email}
-              onChange={this.handleChange}
-              required
-              fullWidth
-              helperText={this.state.errorMessage}
-              error={!!this.state.errorMessage}
-            />
-
-            <TextField
-              label="Position"
-              select
-              value={this.state.selectedPosition}
-              onChange={this.handleChange}
-              name="selectedPosition"
-              fullWidth
-            >
-              {this.state.positions.map((position, index) => {
-                return (
-                  <MenuItem key={index} value={position}>
-                    {position}
-                  </MenuItem>
-                );
-              })}
-            </TextField>
-
-            <TextField
-              label="Phone"
-              type="tel"
-              name="phone"
-              value={this.state.phone}
-              onChange={this.handleChange}
-              pattern="[0-9]{4}-[0-9]{4}"
-              placeholder="3333-3333"
-              maxLength="9"
-              fullWidth
-            />
-
-            <Button
-              variant="contained"
-              size="medium"
-              color="primary"
-              type="submit"
-              style={{ marginTop: 30, float: "right" }}
-            >
-              Send
-            </Button>
-          </form>
-        )}
-      </>
-    );
-  }
-}
+          <Button
+            variant="contained"
+            size="medium"
+            color="primary"
+            type="submit"
+            style={{ marginTop: 30, float: "right" }}
+          >
+            Send
+          </Button>
+        </form>
+      )}
+    </>
+  );
+};
 
 export default EmployeeForm;

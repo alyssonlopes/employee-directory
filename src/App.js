@@ -2,20 +2,20 @@ import React from "react";
 import { EmployeeProvider } from "./providers/Employee";
 import Routes from "./routes";
 import { createTheme, ThemeProvider } from "@material-ui/core/styles";
-import { orange } from "@material-ui/core/colors";
+import { green } from "@material-ui/core/colors";
 import { APIProvider } from "./providers/Api";
 
-const orangeTheme = createTheme({
+const greenTheme = createTheme({
   palette: {
     primary: {
-      main: orange[500],
+      main: green[500],
     },
   },
 });
 
 const App = () => {
   return (
-    <ThemeProvider theme={orangeTheme}>
+    <ThemeProvider theme={greenTheme}>
       <APIProvider>
         <EmployeeProvider>
           <Routes />

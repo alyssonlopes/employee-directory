@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
 import EmployeeList from "../../components/EmployeeList";
@@ -7,17 +7,21 @@ import Loading from "../../components/Loading";
 import { Link } from "react-router-dom";
 import { getEmployeeFromJson } from "../../adapters/employee";
 import { EmployeeContext } from "../../providers/Employee";
-import { get } from "../../api";
+import { APIContext } from "../../providers/Api";
 
-const InnerHomepage = ({ setEmployee }) => {
+const Homepage = () => {
   const [employeesData, setEmployeesData] = useState(null);
   const [employeesList, setEmployeesList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { api } = useContext(APIContext);
+  const { setEmployee } = useContext(EmployeeContext);
+
   useEffect(() => {
+    console.log("useEffect 1");
     async function fetchData() {
       try {
-        const employees = await get("/api/employees");
+        const employees = await api.get("/api/employees");
 
         const list = employees.results.map(getEmployeeFromJson);
         setEmployeesData(list);
@@ -26,9 +30,10 @@ const InnerHomepage = ({ setEmployee }) => {
       }
     }
     return fetchData();
-  }, []);
+  }, [api]);
 
   useEffect(() => {
+    console.log("useEffect 2");
     if (employeesData) {
       setEmployeesList(employeesData);
       setIsLoading(false);
@@ -66,20 +71,6 @@ const InnerHomepage = ({ setEmployee }) => {
         </EmployeeList>
       )}
     </>
-  );
-};
-
-const Homepage = ({ children, ...rest }) => {
-  return (
-    <EmployeeContext.Consumer>
-      {(value) => {
-        return (
-          <InnerHomepage {...rest} {...value}>
-            {children}
-          </InnerHomepage>
-        );
-      }}
-    </EmployeeContext.Consumer>
   );
 };
 
